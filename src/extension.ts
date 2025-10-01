@@ -9,19 +9,19 @@ import { copyLast, copyNextPart, showHistory } from "./cmds/history";
 export function activate(context: vscode.ExtensionContext) {
   setExtensionContext(context);
   context.subscriptions.push(
-    vscode.commands.registerCommand("SauceCode.aiPaste", aiPaste),
-    vscode.commands.registerCommand("SauceCode.copyTree", copyTree),
+    vscode.commands.registerCommand("sauceCode.aiPaste", aiPaste),
+    vscode.commands.registerCommand("sauceCode.copyTree", copyTree),
     vscode.commands.registerCommand(
-      "SauceCode.aiPasteFromExplorer",
+      "sauceCode.aiPasteFromExplorer",
       (uri: vscode.Uri, all?: vscode.Uri[]) => aiPasteFromExplorer(uri, all)
     ),
     vscode.commands.registerCommand(
-      "SauceCode.copyTreeFromExplorer",
+      "sauceCode.copyTreeFromExplorer",
       (uri: vscode.Uri, all?: vscode.Uri[]) => copyTreeFromExplorer(uri, all)
     ),
-    vscode.commands.registerCommand("SauceCode.copyLast", copyLast),
-    vscode.commands.registerCommand("SauceCode.copyNextPart", copyNextPart),
-    vscode.commands.registerCommand("SauceCode.showHistory", showHistory),
+    vscode.commands.registerCommand("sauceCode.copyLast", copyLast),
+    vscode.commands.registerCommand("sauceCode.copyNextPart", copyNextPart),
+    vscode.commands.registerCommand("sauceCode.showHistory", showHistory),
   );
 }
 

@@ -34,7 +34,7 @@ It adds file banners, optional comment stripping, secret masking, and token-awar
 
 ## ⚙️ Extension Settings
 
-This extension contributes the following settings (all under SauceCode.):
+This extension contributes the following settings (all under sauceCode.):
 
 - defaultGlob: default file glob for AI Paste.
 - exclude: additional exclude patterns.

@@ -23,7 +23,10 @@
     "onCommand:sauceCode.aiPaste",
     "onCommand:sauceCode.copyTree",
     "onCommand:sauceCode.aiPasteFromExplorer",
-    "onCommand:sauceCode.copyTreeFromExplorer"
+    "onCommand:sauceCode.copyTreeFromExplorer",
+    "onCommand:sauceCode.copyLast",
+    "onCommand:sauceCode.copyNextPart",
+    "onCommand:sauceCode.showHistory"
   ],
   "main": "./dist/extension.js",
   "contributes": {
@@ -128,6 +131,12 @@
           "type": "boolean",
           "default": true,
           "description": "Normalize TAB characters to two spaces in copied content."
+        },
+        "sauceCode.maxDepthExplorer": {
+          "type": "number",
+          "default": 1024,
+          "minimum": 1,
+          "description": "Max recursion depth when expanding folders in Explorer selection (folderCopyMode=all)."
         },
         "sauceCode.tokenBudget": {
           "type": "number",

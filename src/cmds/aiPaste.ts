@@ -196,9 +196,9 @@ export async function aiPaste() {
         )
         .then(async (action) => {
           if (action === "Copy Next Part") {
-            await vscode.commands.executeCommand("SauceCode.copyNextPart");
+            await vscode.commands.executeCommand("sauceCode.copyNextPart");
           } else if (action === "Open Parts Picker") {
-            await vscode.commands.executeCommand("SauceCode.showHistory");
+            await vscode.commands.executeCommand("sauceCode.showHistory");
           }
         });
       await setSession({ id, index: idx + 1 });

@@ -129,7 +129,7 @@ export async function aiPasteWithFixedUris(
         )
         .then(async (a) => {
           if (a === "Copy Next Part") {
-            await vscode.commands.executeCommand("SauceCode.copyNextPart");
+            await vscode.commands.executeCommand("sauceCode.copyNextPart");
           }
         });
       await setSession({ id, index: idx + 1 });
