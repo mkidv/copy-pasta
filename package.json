@@ -2,7 +2,7 @@
   "name": "copy-pasta",
   "displayName": "copy-pasta",
   "description": "Serve your code al dente",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "publisher": "mki",
   "repository": {
     "type": "git",
@@ -57,108 +57,92 @@
         "command": "copyPasta.copyTreeFromExplorer",
         "title": "Copy: Tree (from selection)"
       }
-    ]
-  },
-  "configuration": {
-    "type": "object",
-    "title": "Copy Pasta",
-    "properties": {
-      "copyPasta.defaultGlob": {
-        "type": "string",
-        "default": "**/*.{dart,ts,tsx,js,jsx,rs,py,go,java,kt,c,cc,cpp,h,hpp,cs,swift,sh,yml,yaml,toml,md,sql,json}",
-        "description": "Default glob"
-      },
-      "copyPasta.exclude": {
-        "type": "array",
-        "items": {
-          "type": "string"
+    ],
+    "configuration": {
+      "type": "object",
+      "title": "CopyPasta",
+      "properties": {
+        "copyPasta.defaultGlob": {
+          "type": "string",
+          "default": "**/*.{dart,ts,tsx,js,jsx,rs,py,go,java,kt,c,cc,cpp,h,hpp,cs,swift,sh,yml,yaml,toml,md,sql,json}",
+          "description": "Default file glob used when running AI Paste from the command."
         },
-        "default": [
-          "**/.git/**",
-          "**/build/**",
-          "**/.dart_tool/**",
-          "**/node_modules/**",
-          "**/dist/**",
-          "**/*.g.dart",
-          "**/*.freezed.dart",
-          "**/*.pb*.dart",
-          "**/*.min.*",
-          "**/*.map",
-          "**/*.lock",
-          "**/*.keystore",
-          "**/*.jks",
-          "**/*.p12",
-          "**/*.pem",
-          "**/*.crt",
-          "**/*.der"
-        ],
-        "description": "Added exclusions."
-      },
-      "copyPasta.maxBytesPerFile": {
-        "type": "number",
-        "default": 2000000,
-        "description": "Max bytes per file."
-      },
-      "copyPasta.stripMode": {
-        "type": "string",
-        "enum": [
-          "none",
-          "safe",
-          "keep-doc"
-        ],
-        "default": "safe",
-        "description": "Strip comments."
-      },
-      "copyPasta.maskSecrets": {
-        "type": "boolean",
-        "default": true,
-        "description": "Auto hide secrets."
-      },
-      "copyPasta.normalizeTabsToSpaces": {
-        "type": "boolean",
-        "default": true,
-        "description": "Convert TAB to 2 spaces."
-      },
-      "copyPasta.tokenBudget": {
-        "type": "number",
-        "default": 12000,
-        "description": "Token budget by parts (chars/4)."
-      },
-      "copyPasta.splitOversizedFiles": {
-        "type": "boolean",
-        "default": true,
-        "description": "Split oversized files."
-      },
-      "copyPasta.oversizedChunkLines": {
-        "type": "number",
-        "default": 400,
-        "description": "Big file sub-parts size."
-      },
-      "copyPasta.includeTree": {
-        "type": "boolean",
-        "default": true,
-        "description": "Include ASCII tree."
-      },
-      "copyPasta.askIncludeEverythingOnExplorer": {
-        "type": "boolean",
-        "default": true,
-        "description": "When copying from Explorer, ask to ignore excludes and size limits."
-      },
-      "copyPasta.folderCopyMode": {
-        "type": "string",
-        "enum": ["all", "respectExcludes"],
-        "default": "all",
-        "description": "When running from a folder selection, include every file (ignore excludes/size) or respect excludes/size."
-      },
-      "copyPasta.maxDepthExplorer": {
-        "type": "number",
-        "default": 64,
-        "description": "Max recursion depth when expanding a folder selection."
-      },
-      "copyPasta.stripDocstringsInPython": {
-        "type": "boolean",
-        "default": true,
-        "description": "Strip docstrings triple-quoted Python (safe/keep-doc ignore)."
+        "copyPasta.exclude": {
+          "type": "array",
+          "items": { "type": "string" },
+          "default": [
+            "**/.git/**",
+            "**/build/**",
+            "**/.dart_tool/**",
+            "**/node_modules/**",
+            "**/dist/**",
+            "**/*.g.dart",
+            "**/*.freezed.dart",
+            "**/*.pb*.dart",
+            "**/*.min.*",
+            "**/*.map",
+            "**/*.lock",
+            "**/*.keystore",
+            "**/*.jks",
+            "**/*.p12",
+            "**/*.pem",
+            "**/*.crt",
+            "**/*.der"
+          ],
+          "description": "Additional exclusion globs applied when searching files."
+        },
+        "copyPasta.maxBytesPerFile": {
+          "type": "number",
+          "default": 2000000,
+          "description": "Skip files larger than this size (in bytes)."
+        },
+        "copyPasta.stripMode": {
+          "type": "string",
+          "enum": ["none", "safe", "keep-doc"],
+          "default": "safe",
+          "description": "Comment stripping mode: none, safe (strip comments), or keep-doc (keep doc comments)."
+        },
+        "copyPasta.stripDocstringsInPython": {
+          "type": "boolean",
+          "default": true,
+          "description": "Also strip triple-quoted Python docstrings (ignored when stripMode is keep-doc)."
+        },
+        "copyPasta.maskSecrets": {
+          "type": "boolean",
+          "default": true,
+          "description": "Mask common secret patterns (API keys, JWT, PEM blocks) in copied content."
+        },
+        "copyPasta.normalizeTabsToSpaces": {
+          "type": "boolean",
+          "default": true,
+          "description": "Normalize TAB characters to two spaces in copied content."
+        },
+        "copyPasta.tokenBudget": {
+          "type": "number",
+          "default": 12000,
+          "description": "Approximate token budget per part (tokens ≈ characters/4)."
+        },
+        "copyPasta.splitOversizedFiles": {
+          "type": "boolean",
+          "default": true,
+          "description": "Split single files that exceed the token budget into multiple parts."
+        },
+        "copyPasta.oversizedChunkLines": {
+          "type": "number",
+          "default": 400,
+          "description": "Number of lines per sub-part when splitting oversized files."
+        },
+        "copyPasta.includeTree": {
+          "type": "boolean",
+          "default": true,
+          "description": "Include an ASCII directory tree of the project in the copied bundle."
+        },
+        "copyPasta.folderCopyMode": {
+          "type": "string",
+          "enum": ["all", "respectExcludes"],
+          "default": "all",
+          "description": "When starting from folders in Explorer: include every file (ignore excludes/size) or respect exclusion globs and size limits."
+        }
       }
     }
   },
