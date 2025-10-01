@@ -55,12 +55,14 @@ This extension contributes the following settings (all under copyPasta.):
 
 ## 📦 Release Notes
 
+### 0.3.0
+
+- Refactor & optimize
+
 ### 0.2.0
 
 - Added AI Paste Mode with context header, secret masking, token-aware chunking.
-
 - Added Explorer right-click support (multi-select).
-
 - Added Copy Tree command.
 
 ### 0.1.0

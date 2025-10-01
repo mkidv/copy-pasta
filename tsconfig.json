@@ -9,7 +9,12 @@
     "rootDir": "src",
     "sourceMap": true,
     "types": ["node", "vscode"],
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "baseUrl": ".",
+    "paths": {
+      "@core/*": ["src/core/*"],
+      "@cmds/*": ["src/cmds/*"]
+    }
   },
   "include": ["src/**/*"]
 }
