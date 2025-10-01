@@ -4,7 +4,14 @@
   "description": "Serve your code al dente",
   "version": "0.2.0",
   "publisher": "mki",
-  "repository": {},
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mkidv/copy-pasta.git"
+  },
+  "bugs": {
+    "url": "https://github.com/mkidv/copy-pasta/issues"
+  },
+  "homepage": "https://github.com/mkidv/copy-pasta#readme",
   "engines": {
     "vscode": "^1.104.0"
   },
