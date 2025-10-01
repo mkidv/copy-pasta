@@ -6,7 +6,12 @@ import { buildTree } from "../core/fsTree";
 import { stripComments } from "../core/strip";
 import { maskSecretsFn } from "../core/secrets";
 import { languageFromExt } from "../core/lang";
-import { chunkBundles, buildContextHeader, FileMeta } from "../core/bundle";
+import {
+  chunkBundles,
+  buildContextHeader,
+  FileMeta,
+  buildBundle,
+} from "../core/bundle";
 import {
   estimateTokens,
   sha256Hex,
@@ -104,11 +109,17 @@ ${text}
   }
 
   const tree = cfg.includeTree ? await buildTree(rootUri) : null;
-  const ctx = await buildContextHeader(rootUri, metas, tree, goal, {
-    stripMode: cfg.stripMode,
-    maskSecrets: cfg.maskSecrets,
+  const parts = await buildBundle({
+    root: rootUri,
+    metas,
+    tree,
+    goal,
+    rules: { stripMode: cfg.stripMode, maskSecrets: cfg.maskSecrets },
+    blocks,
+    tokenBudget: cfg.tokenBudget,
+    compact: cfg.compactBlankLines,
+    keepCRLF: false, // on reste en \n comme dans le pipeline
   });
-  const parts = chunkBundles(ctx, blocks, cfg.tokenBudget);
 
   if (parts.length === 1) {
     await vscode.env.clipboard.writeText(parts[0]);

@@ -6,15 +6,24 @@ import { buildTree } from "../core/fsTree";
 import { stripComments } from "../core/strip";
 import { maskSecretsFn } from "../core/secrets";
 import { languageFromExt } from "../core/lang";
-import { chunkBundles, buildContextHeader, FileMeta } from "../core/bundle";
+import {
+  chunkBundles,
+  buildContextHeader,
+  FileMeta,
+  buildBundle,
+} from "../core/bundle";
 import { limit, estimateTokens, sha256Hex } from "../core/utils";
 import { exec as execCb } from "child_process";
 import { promisify } from "util";
 const exec = promisify(execCb);
 
 function mergeExcludes(ex: string[]): string {
-  if (!ex.length) {return "";}
-  if (ex.length === 1) {return ex[0];}
+  if (!ex.length) {
+    return "";
+  }
+  if (ex.length === 1) {
+    return ex[0];
+  }
   return `{${ex.join(",")}}`;
 }
 
@@ -37,13 +46,17 @@ export async function aiPaste() {
   );
   const rootUri =
     choice?.root ??
-    (await vscode.window.showOpenDialog({
-      canSelectFiles: false,
-      canSelectFolders: true,
-      canSelectMany: false,
-      openLabel: "Use this folder",
-    }))?.[0];
-  if (!rootUri) {return;}
+    (
+      await vscode.window.showOpenDialog({
+        canSelectFiles: false,
+        canSelectFolders: true,
+        canSelectMany: false,
+        openLabel: "Use this folder",
+      })
+    )?.[0];
+  if (!rootUri) {
+    return;
+  }
 
   // Goal + glob
   const goal =
@@ -63,7 +76,11 @@ export async function aiPaste() {
     ? new vscode.RelativePattern(rootUri, mergeExcludes(cfg.exclude))
     : undefined;
 
-  const uris = await vscode.workspace.findFiles(include, exclude as any, 100000);
+  const uris = await vscode.workspace.findFiles(
+    include,
+    exclude as any,
+    100000
+  );
   if (!uris.length) {
     vscode.window.showWarningMessage("No file found.");
     return;
@@ -85,14 +102,22 @@ export async function aiPaste() {
           limit(async () => {
             try {
               const st = await vscode.workspace.fs.stat(u);
-              if (st.type & vscode.FileType.Directory) {return;}
-              if (st.size > cfg.maxBytesPerFile) {return;}
+              if (st.type & vscode.FileType.Directory) {
+                return;
+              }
+              if (st.size > cfg.maxBytesPerFile) {
+                return;
+              }
 
               let text = await fs.readFile(u.fsPath, "utf8");
               text = text.replace(/\r\n/g, "\n");
-              if (cfg.normalizeTabsToSpaces) {text = text.replace(/\t/g, "  ");}
+              if (cfg.normalizeTabsToSpaces) {
+                text = text.replace(/\t/g, "  ");
+              }
 
-              const lang = languageFromExt(path.extname(u.fsPath).toLowerCase());
+              const lang = languageFromExt(
+                path.extname(u.fsPath).toLowerCase()
+              );
               if (cfg.stripMode !== "none") {
                 text = stripComments(
                   text,
@@ -101,15 +126,16 @@ export async function aiPaste() {
                   cfg.stripDocstringsInPython
                 );
               }
-              if (cfg.maskSecrets) {text = maskSecretsFn(text);}
+              if (cfg.maskSecrets) {
+                text = maskSecretsFn(text);
+              }
               text = text.replace(/[ \t]+$/gm, "");
 
               const lines = text.split("\n").length;
               const bytes = Buffer.byteLength(text, "utf8");
               const rel =
-                path
-                  .relative(rootUri.fsPath, u.fsPath)
-                  .replaceAll("\\", "/") || path.basename(u.fsPath);
+                path.relative(rootUri.fsPath, u.fsPath).replaceAll("\\", "/") ||
+                path.basename(u.fsPath);
               const hash = sha256Hex(text);
 
               metas.push({ rel, lang, lines, bytes, hash });
@@ -139,7 +165,11 @@ ${text}
   }
 
   // Git (best effort)
-  let git = { branch: "n/a", head: "n/a", dirty: "n/a" as "n/a" | "clean" | "dirty" };
+  let git = {
+    branch: "n/a",
+    head: "n/a",
+    dirty: "n/a" as "n/a" | "clean" | "dirty",
+  };
   try {
     const { stdout: br } = await exec("git rev-parse --abbrev-ref HEAD", {
       cwd: rootUri.fsPath,
@@ -156,16 +186,18 @@ ${text}
   } catch {}
 
   const tree = cfg.includeTree ? await buildTree(rootUri) : null;
-  const ctx = await buildContextHeader(
-    rootUri,
+  const parts = await buildBundle({
+    root: rootUri,
     metas,
     tree,
     goal,
-    { stripMode: cfg.stripMode, maskSecrets: cfg.maskSecrets },
-    git
-  );
-
-  const parts = chunkBundles(ctx, blocks, cfg.tokenBudget);
+    rules: { stripMode: cfg.stripMode, maskSecrets: cfg.maskSecrets },
+    gitInfo: git,
+    blocks,
+    tokenBudget: cfg.tokenBudget,
+    compact: cfg.compactBlankLines,
+    keepCRLF: false, // on reste en \n comme dans le pipeline
+  });
 
   if (parts.length === 1) {
     await vscode.env.clipboard.writeText(parts[0]);
@@ -183,13 +215,16 @@ ${text}
       ],
       { title: "CopyPasta – Parts" }
     );
-    if (!pick) {return;}
+    if (!pick) {
+      return;
+    }
     if (pick.label.startsWith("Copy All")) {
       await vscode.env.clipboard.writeText(
         parts
           .map(
             (p, i) =>
-              p + (i < parts.length - 1 ? "\n=== CONTINUE IN NEXT PART ===\n" : "")
+              p +
+              (i < parts.length - 1 ? "\n=== CONTINUE IN NEXT PART ===\n" : "")
           )
           .join("\n")
       );

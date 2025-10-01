@@ -6,6 +6,7 @@ export interface PastaConfig {
   exclude: string[];
   maxBytesPerFile: number;
   stripMode: StripMode;
+  compactBlankLines: boolean;
   maskSecrets: boolean;
   tokenBudget: number;
   includeTree: boolean;
@@ -25,6 +26,7 @@ export function getConfig(): PastaConfig {
     exclude: get("exclude", []),
     maxBytesPerFile: get("maxBytesPerFile", 1024*1024),
     stripMode: get<StripMode>("stripMode", "none"),
+    compactBlankLines: get("compactBlankLines", true),
     maskSecrets: get("maskSecrets", true),
     tokenBudget: get("tokenBudget", 12000),
     includeTree: get("includeTree", true),

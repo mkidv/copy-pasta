@@ -2,7 +2,7 @@
   "name": "copy-pasta",
   "displayName": "copy-pasta",
   "description": "Serve your code al dente",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "publisher": "mki",
   "repository": {
     "type": "git",
@@ -69,7 +69,9 @@
         },
         "copyPasta.exclude": {
           "type": "array",
-          "items": { "type": "string" },
+          "items": {
+            "type": "string"
+          },
           "default": [
             "**/.git/**",
             "**/build/**",
@@ -98,7 +100,11 @@
         },
         "copyPasta.stripMode": {
           "type": "string",
-          "enum": ["none", "safe", "keep-doc"],
+          "enum": [
+            "none",
+            "safe",
+            "keep-doc"
+          ],
           "default": "safe",
           "description": "Comment stripping mode: none, safe (strip comments), or keep-doc (keep doc comments)."
         },
@@ -106,6 +112,11 @@
           "type": "boolean",
           "default": true,
           "description": "Also strip triple-quoted Python docstrings (ignored when stripMode is keep-doc)."
+        },
+        "copyPasta.compactBlankLines": {
+          "type": "boolean",
+          "default": true,
+          "description": "Collapse multiple blank lines in the final bundle output (post-process)."
         },
         "copyPasta.maskSecrets": {
           "type": "boolean",
@@ -139,7 +150,10 @@
         },
         "copyPasta.folderCopyMode": {
           "type": "string",
-          "enum": ["all", "respectExcludes"],
+          "enum": [
+            "all",
+            "respectExcludes"
+          ],
           "default": "all",
           "description": "When starting from folders in Explorer: include every file (ignore excludes/size) or respect exclusion globs and size limits."
         }

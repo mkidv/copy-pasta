@@ -120,3 +120,41 @@ export async function buildContextHeader(
   parts.push("=== TABLE OF CONTENTS ===\n" + toc + "\n=== END TOC ===\n");
   return parts.join("\n");
 }
+
+export function compactBlankLines(s: string, keepCRLF = true): string {
+  const eol = keepCRLF ? "\r\n" : "\n";
+  // Collapse 2+ blank lines (incluant lignes avec espaces) → 1 blank line
+  s = s.replace(/(?:\r?\n[ \t]*){2,}/g, `${eol}${eol}`);
+  // Trim trailing spaces
+  s = s.replace(/[ \t]+(?=\r?$)/gm, "");
+  return s;
+}
+
+export async function buildBundle(opts: {
+  root: vscode.Uri;
+  metas: FileMeta[];
+  tree: string | null;
+  goal: string;
+  rules: { stripMode: string; maskSecrets: boolean };
+  gitInfo?: { branch: string; head: string; dirty: "clean" | "dirty" | "n/a" };
+  blocks: string[];
+  tokenBudget: number;
+  compact?: boolean; // default: true
+  keepCRLF?: boolean; // default: false (on garde \n)
+}): Promise<string[]> {
+  const ctx = await buildContextHeader(
+    opts.root,
+    opts.metas,
+    opts.tree,
+    opts.goal,
+    opts.rules,
+    opts.gitInfo
+  );
+  const parts = chunkBundles(ctx, opts.blocks, opts.tokenBudget);
+  const doCompact = opts.compact ?? true;
+  if (!doCompact) {
+    return parts;
+  }
+  const keepCRLF = opts.keepCRLF ?? false;
+  return parts.map((p) => compactBlankLines(p, keepCRLF));
+}

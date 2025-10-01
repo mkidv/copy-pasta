@@ -58,6 +58,7 @@ This extension contributes the following settings (all under copyPasta.):
 ### 0.3.0
 
 - Refactor & optimize
+- Add compact blank lines
 
 ### 0.2.0
 
