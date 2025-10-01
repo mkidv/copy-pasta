@@ -1,23 +1,17 @@
 import * as vscode from "vscode";
 import * as path from "path";
-import * as fs from "fs/promises";
-import { getConfig } from "../core/config";
-import { buildTree } from "../core/fsTree";
-import { stripComments } from "../core/strip";
-import { maskSecretsFn } from "../core/secrets";
-import { languageFromExt } from "../core/lang";
-import {
-  chunkBundles,
-  buildContextHeader,
-  FileMeta,
-  buildBundle,
-} from "../core/bundle";
+import { getConfig } from "@core/config";
+import { buildTree } from "@core/fsTree";
+import { FileMeta, buildBundle } from "@core/bundle";
 import {
   estimateTokens,
   sha256Hex,
   commonRootDir,
   ensureDirPath,
-} from "../core/utils";
+} from "@core/utils";
+import { pushHistory, setSession } from "@core/history";
+import { logBlock, toastWithLog } from "@core/log";
+import { processUris } from "@core/processor";
 
 export async function aiPasteWithFixedUris(
   uris: vscode.Uri[],
@@ -36,66 +30,21 @@ export async function aiPasteWithFixedUris(
       value: "Review & refactor selected files.",
     })) || "";
 
-  const metas: FileMeta[] = [];
-  const blocks: string[] = [];
-  const skipped: { path: string; reason: string }[] = [];
-  const errors: string[] = [];
+  let metas: FileMeta[] = [];
+  let blocks: string[] = [];
+  let skipped: { path: string; reason: string }[] = [];
+  let errors: string[] = [];
 
-  for (const u of uris) {
-    try {
-      const st = await vscode.workspace.fs.stat(u);
-      if (st.type & vscode.FileType.Directory) {
-        continue;
-      }
-      if (!ignoreSize && st.size > cfg.maxBytesPerFile) {
-        skipped.push({ path: u.fsPath, reason: `size>${cfg.maxBytesPerFile}` });
-        continue;
-      }
-
-      let text = await fs.readFile(u.fsPath, "utf8");
-      text = text.replace(/\r\n/g, "\n");
-      if (cfg.normalizeTabsToSpaces) {
-        text = text.replace(/\t/g, "  ");
-      }
-
-      const lang = languageFromExt(path.extname(u.fsPath).toLowerCase());
-      if (cfg.stripMode !== "none") {
-        text = stripComments(
-          text,
-          lang,
-          cfg.stripMode,
-          cfg.stripDocstringsInPython
-        );
-      }
-      if (cfg.maskSecrets) {
-        text = maskSecretsFn(text);
-      }
-      text = text.replace(/[ \t]+$/gm, "");
-
-      const lines = text.split("\n").length;
-      const bytes = Buffer.byteLength(text, "utf8");
-      let rel = path.relative(rootFs, u.fsPath).replaceAll("\\", "/");
-      if (!rel) {
-        rel = path.basename(u.fsPath);
-      }
-      const hash = sha256Hex(text);
-
-      metas.push({ rel, lang, lines, bytes, hash });
-      blocks.push(
-        `=== FILE: ${rel} | LINES:${lines} BYTES:${bytes} | LANG:${
-          lang ?? "plain"
-        } | HASH:sha256:${hash} ===
-\`\`\`${lang ?? ""}
-${text}
-\`\`\`
-=== END FILE ===
-
-`
-      );
-    } catch (e: any) {
-      errors.push(`${u.fsPath}: ${e?.message ?? e}`);
-    }
-  }
+  const out = await processUris({
+    uris,
+    cfg,
+    rootFs,
+    ignoreSizeLimit: !!ignoreSize,
+  });
+  metas = out.metas;
+  blocks = out.blocks;
+  skipped = out.skipped;
+  errors = out.errors;
 
   if (!blocks.length) {
     vscode.window.showWarningMessage("No usable files in selection.");
@@ -121,8 +70,27 @@ ${text}
     keepCRLF: false, // on reste en \n comme dans le pipeline
   });
 
+  const projectName = path.basename(rootUri.fsPath);
+  const tokensApprox = parts.map((p) => estimateTokens(p));
+  const id = sha256Hex(parts.join("\n"));
+  await pushHistory({
+    id,
+    createdAt: Date.now(),
+    project: projectName,
+    goal,
+    files: metas.length,
+    bytes: metas.reduce((a, m) => a + m.bytes, 0),
+    partsCount: parts.length,
+    tokensApprox,
+    parts,
+  });
+
   if (parts.length === 1) {
     await vscode.env.clipboard.writeText(parts[0]);
+    vscode.window.showInformationMessage(
+      `CopyPasta – selection copied (1 part, ${metas.length} files).`
+    );
+    await setSession(null);
   } else {
     const pick = await vscode.window.showQuickPick(
       [
@@ -147,25 +115,37 @@ ${text}
           )
           .join("\n")
       );
+      vscode.window.showInformationMessage(
+        `CopyPasta – selection copied (${parts.length} parts).`
+      );
+      await setSession(null);
     } else {
       const idx = parseInt(pick.label.split(" ")[2]) - 1;
       await vscode.env.clipboard.writeText(parts[idx]);
+      vscode.window
+        .showInformationMessage(
+          `CopyPasta – PART ${idx + 1}/${parts.length} copied.`,
+          "Copy Next Part"
+        )
+        .then(async (a) => {
+          if (a === "Copy Next Part") {
+            await vscode.commands.executeCommand("copyPasta.copyNextPart");
+          }
+        });
+      await setSession({ id, index: idx + 1 });
     }
   }
 
   if (opts?.showSkipReport && skipped.length) {
-    vscode.window.showInformationMessage(
-      `Skipped ${skipped.length} large file(s). See Output log.`
+    logBlock(
+      "withFixed – skipped (oversized or filtered)",
+      skipped.map((s) => `- ${s.path} (${s.reason})`)
     );
-    console.log(
-      "CopyPasta skipped:\n" +
-        skipped.map((s) => `- ${s.path} (${s.reason})`).join("\n")
-    );
+    await toastWithLog(`Skipped ${skipped.length} file(s).`);
   }
+  
   if (errors.length) {
-    vscode.window.showWarningMessage(
-      `Some selected files failed: ${errors.length}. See Output Log.`
-    );
-    console.log("CopyPasta errors:\n" + errors.join("\n"));
+    logBlock("withFixed – errors", errors);
+    await toastWithLog(`Some selected files failed: ${errors.length}.`);
   }
 }

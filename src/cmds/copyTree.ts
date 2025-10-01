@@ -1,5 +1,5 @@
 import * as vscode from "vscode";
-import { buildTree } from "../core/fsTree";
+import { buildTree } from "@core/fsTree";
 
 export async function copyTree() {
   const ws = vscode.workspace.workspaceFolders?.[0];
@@ -31,6 +31,6 @@ export async function copyTree() {
   }
 
   const tree = await buildTree(root);
-  await vscode.env.clipboard.writeText(tree);
+  await vscode.env.clipboard.writeText("```text\n" + tree + "\n```");
   vscode.window.showInformationMessage("Tree copied.");
 }

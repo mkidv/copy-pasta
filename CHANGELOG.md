@@ -1,9 +1,49 @@
-# Change Log
+## [0.4.0] - 2025-10-02
+### Added
+- Introduced **history support** for AI Paste.
+- Added **copy next for bundles**, enabling incremental copy of multi-part bundles.
 
-All notable changes to the "copy-pasta" extension will be documented in this file.
+### Changed
+- Multiple internal refactors and stability improvements.
 
-Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
+---
 
-## [Unreleased]
+## [0.3.2] - 2025-10-01
+### Fixed
+- Improve exclusion handling for generated files (`*.freezed.dart`, `*.g.dart`, `.pb.dart`).
+- Correctly apply `copyPasta.exclude` patterns during folder and tree copy.
 
-- Initial release
+---
+
+## [0.3.1] - 2025-10-01
+### Fixed
+- Better handling of oversized files split into chunks.
+- Minor bug fixes around Explorer integration.
+
+---
+
+## [0.3.0] - 2025-10-01
+### Added
+- **Compact blank lines** option: collapse multiple blank lines in output.
+- New configuration options:  
+  - `copyPasta.stripDocstringsInPython`  
+  - `copyPasta.normalizeTabsToSpaces`  
+  - `copyPasta.folderCopyMode`
+
+### Changed
+- Large refactor and optimization of the core bundling logic.
+
+---
+
+## [0.2.0] - 2025-10-01
+### Added
+- **AI Paste Mode** with project context header (project info, git state, file TOC).
+- **Secret masking** (API keys, JWT, PEM, etc.).
+- **Token-aware chunking** (split long pastes into PART 1/2/…).
+- **Explorer integration** (multi-select support).
+- **Copy Tree** command.
+
+---
+
+## [0.1.0] - 2025-09
+- Initial release with basic file copy including file banners.

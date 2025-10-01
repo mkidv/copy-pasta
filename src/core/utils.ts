@@ -34,6 +34,16 @@ export function estimateTokens(s: string): number {
   return Math.ceil(s.length / 4);
 }
 
+export function chunkByLines(text: string, linesPerChunk: number): string[] {
+  if (linesPerChunk <= 0) {return [text];}
+  const lines = text.split("\n");
+  const chunks: string[] = [];
+  for (let i = 0; i < lines.length; i += linesPerChunk) {
+    chunks.push(lines.slice(i, i + linesPerChunk).join("\n"));
+  }
+  return chunks;
+}
+
 export function commonRootDir(paths: string[]): string {
   if (!paths.length) {
     return process.cwd();

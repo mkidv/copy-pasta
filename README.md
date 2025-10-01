@@ -55,6 +55,12 @@ This extension contributes the following settings (all under copyPasta.):
 
 ## 📦 Release Notes
 
+### 0.4.0
+
+- Add history
+- Add copy next for bundles
+- Some fixes & refactors
+
 ### 0.3.0
 
 - Refactor & optimize

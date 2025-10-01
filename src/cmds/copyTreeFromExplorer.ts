@@ -1,5 +1,5 @@
 import * as vscode from "vscode";
-import { buildTree, isDir } from "../core/fsTree";
+import { buildTree, isDir } from "@core/fsTree";
 
 export async function copyTreeFromExplorer(
   uri: vscode.Uri,

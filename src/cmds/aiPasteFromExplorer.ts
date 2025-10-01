@@ -1,6 +1,6 @@
 import * as vscode from "vscode";
-import { getConfig } from "../core/config";
-import { expandDirAllFiles, isDir } from "../core/fsTree";
+import { getConfig } from "@core/config";
+import { expandDirAllFiles, isDir } from "@core/fsTree";
 import { aiPasteWithFixedUris } from "./withFixed";
 
 export async function aiPasteFromExplorer(uri: vscode.Uri, all?: vscode.Uri[]) {
@@ -19,7 +19,6 @@ export async function aiPasteFromExplorer(uri: vscode.Uri, all?: vscode.Uri[]) {
 
   if (allDirs) {
     if (cfg.folderCopyMode === "all") {
-      // Inclut TOUT récursivement (ignorer excludes & tailles)
       for (const d of targets) {
         const tmp: string[] = [];
         await expandDirAllFiles(d.fsPath, cfg.maxDepthExplorer, tmp);
@@ -31,10 +30,12 @@ export async function aiPasteFromExplorer(uri: vscode.Uri, all?: vscode.Uri[]) {
       });
       return;
     } else {
-      // Respecte excludes → utiliser findFiles avec **/* (pas ***)
       for (const d of targets) {
-        const rel = new vscode.RelativePattern(d, "**/*"); // FIX
-        const found = await vscode.workspace.findFiles(rel, undefined, 500_000);
+        const rp = new vscode.RelativePattern(d, cfg.defaultGlob);
+        const ex = cfg.exclude.length
+          ? new vscode.RelativePattern(d, `{${cfg.exclude.join(",")}}`)
+          : undefined;
+        const found = await vscode.workspace.findFiles(rp, ex as any, 500_000);
         include.push(...found);
       }
       await aiPasteWithFixedUris(include, {
