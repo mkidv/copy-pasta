@@ -1,0 +1,172 @@
+{
+  "name": "copy-pasta",
+  "displayName": "copy-pasta",
+  "description": "Serve your code al dente",
+  "version": "0.2.0",
+  "publisher": "mki",
+  "repository": {},
+  "engines": {
+    "vscode": "^1.104.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onCommand:copyPasta.aiPaste",
+    "onCommand:copyPasta.copyTree",
+    "onCommand:copyPasta.aiPasteFromExplorer",
+    "onCommand:copyPasta.copyTreeFromExplorer"
+  ],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "menus": {
+      "explorer/context": [
+        {
+          "command": "copyPasta.aiPasteFromExplorer",
+          "group": "navigation@10",
+          "when": "resourceScheme == file"
+        },
+        {
+          "command": "copyPasta.copyTreeFromExplorer",
+          "group": "navigation@11",
+          "when": "resourceScheme == file"
+        }
+      ]
+    },
+    "commands": [
+      {
+        "command": "copyPasta.aiPaste",
+        "title": "Copy: AI Paste (token-aware)"
+      },
+      {
+        "command": "copyPasta.copyTree",
+        "title": "Copy: Tree"
+      },
+      {
+        "command": "copyPasta.aiPasteFromExplorer",
+        "title": "Copy: AI Paste (from selection)"
+      },
+      {
+        "command": "copyPasta.copyTreeFromExplorer",
+        "title": "Copy: Tree (from selection)"
+      }
+    ]
+  },
+  "configuration": {
+    "type": "object",
+    "title": "Copy Pasta",
+    "properties": {
+      "copyPasta.defaultGlob": {
+        "type": "string",
+        "default": "**/*.{dart,ts,tsx,js,jsx,rs,py,go,java,kt,c,cc,cpp,h,hpp,cs,swift,sh,yml,yaml,toml,md,sql,json}",
+        "description": "Default glob"
+      },
+      "copyPasta.exclude": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        },
+        "default": [
+          "**/.git/**",
+          "**/build/**",
+          "**/.dart_tool/**",
+          "**/node_modules/**",
+          "**/dist/**",
+          "**/*.g.dart",
+          "**/*.freezed.dart",
+          "**/*.pb*.dart",
+          "**/*.min.*",
+          "**/*.map",
+          "**/*.lock",
+          "**/*.keystore",
+          "**/*.jks",
+          "**/*.p12",
+          "**/*.pem",
+          "**/*.crt",
+          "**/*.der"
+        ],
+        "description": "Added exclusions."
+      },
+      "copyPasta.maxBytesPerFile": {
+        "type": "number",
+        "default": 2000000,
+        "description": "Max bytes per file."
+      },
+      "copyPasta.stripMode": {
+        "type": "string",
+        "enum": [
+          "none",
+          "safe",
+          "keep-doc"
+        ],
+        "default": "safe",
+        "description": "Strip comments."
+      },
+      "copyPasta.maskSecrets": {
+        "type": "boolean",
+        "default": true,
+        "description": "Auto hide secrets."
+      },
+      "copyPasta.normalizeTabsToSpaces": {
+        "type": "boolean",
+        "default": true,
+        "description": "Convert TAB to 2 spaces."
+      },
+      "copyPasta.tokenBudget": {
+        "type": "number",
+        "default": 12000,
+        "description": "Token budget by parts (chars/4)."
+      },
+      "copyPasta.splitOversizedFiles": {
+        "type": "boolean",
+        "default": true,
+        "description": "Split oversized files."
+      },
+      "copyPasta.oversizedChunkLines": {
+        "type": "number",
+        "default": 400,
+        "description": "Big file sub-parts size."
+      },
+      "copyPasta.includeTree": {
+        "type": "boolean",
+        "default": true,
+        "description": "Include ASCII tree."
+      },
+      "copyPasta.stripDocstringsInPython": {
+        "type": "boolean",
+        "default": true,
+        "description": "Strip docstrings triple-quoted Python (safe/keep-doc ignore)."
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run package",
+    "compile": "npm run check-types && npm run lint && node esbuild.js",
+    "watch": "npm-run-all -p watch:*",
+    "watch:esbuild": "node esbuild.js --watch",
+    "watch:tsc": "tsc --noEmit --watch --project tsconfig.json",
+    "package": "npm run check-types && npm run lint && node esbuild.js --production",
+    "compile-tests": "tsc -p . --outDir out",
+    "watch-tests": "tsc -p . -w --outDir out",
+    "pretest": "npm run compile-tests && npm run compile && npm run lint",
+    "check-types": "tsc --noEmit",
+    "lint": "eslint src",
+    "test": "vscode-test"
+  },
+  "devDependencies": {
+    "@types/mocha": "^10.0.10",
+    "@types/node": "22.x",
+    "@types/vscode": "^1.104.0",
+    "@typescript-eslint/eslint-plugin": "^8.42.0",
+    "@typescript-eslint/parser": "^8.42.0",
+    "@vscode/test-cli": "^0.0.11",
+    "@vscode/test-electron": "^2.5.2",
+    "esbuild": "^0.25.9",
+    "eslint": "^9.34.0",
+    "npm-run-all": "^4.1.5",
+    "typescript": "^5.9.2"
+  },
+  "dependencies": {
+    "vsce": "^2.15.0"
+  }
+}
