@@ -1,3 +1,9 @@
+## [0.5.0] - 2025-10-02
+
+### Changed
+- Rebrand **CopyPasta** to **SauceCode** (command IDs, config keys, display name).
+
+---
 ## [0.4.0] - 2025-10-02
 ### Added
 - Introduced **history support** for AI Paste.
@@ -11,7 +17,7 @@
 ## [0.3.2] - 2025-10-01
 ### Fixed
 - Improve exclusion handling for generated files (`*.freezed.dart`, `*.g.dart`, `.pb.dart`).
-- Correctly apply `copyPasta.exclude` patterns during folder and tree copy.
+- Correctly apply `sauceCode.exclude` patterns during folder and tree copy.
 
 ---
 
@@ -26,9 +32,9 @@
 ### Added
 - **Compact blank lines** option: collapse multiple blank lines in output.
 - New configuration options:  
-  - `copyPasta.stripDocstringsInPython`  
-  - `copyPasta.normalizeTabsToSpaces`  
-  - `copyPasta.folderCopyMode`
+  - `sauceCode.stripDocstringsInPython`  
+  - `sauceCode.normalizeTabsToSpaces`  
+  - `sauceCode.folderCopyMode`
 
 ### Changed
 - Large refactor and optimization of the core bundling logic.

@@ -80,7 +80,7 @@ export async function aiPaste() {
   await vscode.window.withProgress(
     {
       location: vscode.ProgressLocation.Notification,
-      title: "CopyPasta: preparing files…",
+      title: "SauceCode: preparing files…",
     },
     async () => {
        const out = await processUris({
@@ -155,7 +155,7 @@ export async function aiPaste() {
   if (parts.length === 1) {
     await vscode.env.clipboard.writeText(parts[0]);
     vscode.window.showInformationMessage(
-      `CopyPasta (1 part, ${metas.length} files) copied.`
+      `SauceCode (1 part, ${metas.length} files) copied.`
     );
   } else {
     const pick = await vscode.window.showQuickPick(
@@ -166,7 +166,7 @@ export async function aiPaste() {
           detail: `~${estimateTokens(parts[i])} tokens`,
         })),
       ],
-      { title: "CopyPasta – Parts" }
+      { title: "SauceCode – Parts" }
     );
     if (!pick) {
       return;
@@ -182,7 +182,7 @@ export async function aiPaste() {
           .join("\n")
       );
       vscode.window.showInformationMessage(
-        `CopyPasta (${parts.length} parts) copied.`
+        `SauceCode (${parts.length} parts) copied.`
       );
       await setSession(null);
     } else {
@@ -190,15 +190,15 @@ export async function aiPaste() {
       await vscode.env.clipboard.writeText(parts[idx]);
       vscode.window
         .showInformationMessage(
-          `CopyPasta – PART ${idx + 1}/${parts.length} copied.`,
+          `SauceCode – PART ${idx + 1}/${parts.length} copied.`,
           "Copy Next Part",
           "Open Parts Picker"
         )
         .then(async (action) => {
           if (action === "Copy Next Part") {
-            await vscode.commands.executeCommand("copyPasta.copyNextPart");
+            await vscode.commands.executeCommand("SauceCode.copyNextPart");
           } else if (action === "Open Parts Picker") {
-            await vscode.commands.executeCommand("copyPasta.showHistory");
+            await vscode.commands.executeCommand("SauceCode.showHistory");
           }
         });
       await setSession({ id, index: idx + 1 });

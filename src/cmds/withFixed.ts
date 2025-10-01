@@ -50,7 +50,7 @@ export async function aiPasteWithFixedUris(
     vscode.window.showWarningMessage("No usable files in selection.");
     if (opts?.showSkipReport && skipped.length) {
       console.log(
-        "CopyPasta skipped:\n" +
+        "SauceCode skipped:\n" +
           skipped.map((s) => `- ${s.path} (${s.reason})`).join("\n")
       );
     }
@@ -88,7 +88,7 @@ export async function aiPasteWithFixedUris(
   if (parts.length === 1) {
     await vscode.env.clipboard.writeText(parts[0]);
     vscode.window.showInformationMessage(
-      `CopyPasta – selection copied (1 part, ${metas.length} files).`
+      `SauceCode – selection copied (1 part, ${metas.length} files).`
     );
     await setSession(null);
   } else {
@@ -100,7 +100,7 @@ export async function aiPasteWithFixedUris(
           detail: `~${estimateTokens(parts[i])} tokens`,
         })),
       ],
-      { title: "CopyPasta – Parts (selection)" }
+      { title: "SauceCode – Parts (selection)" }
     );
     if (!pick) {
       return;
@@ -116,7 +116,7 @@ export async function aiPasteWithFixedUris(
           .join("\n")
       );
       vscode.window.showInformationMessage(
-        `CopyPasta – selection copied (${parts.length} parts).`
+        `SauceCode – selection copied (${parts.length} parts).`
       );
       await setSession(null);
     } else {
@@ -124,12 +124,12 @@ export async function aiPasteWithFixedUris(
       await vscode.env.clipboard.writeText(parts[idx]);
       vscode.window
         .showInformationMessage(
-          `CopyPasta – PART ${idx + 1}/${parts.length} copied.`,
+          `SauceCode – PART ${idx + 1}/${parts.length} copied.`,
           "Copy Next Part"
         )
         .then(async (a) => {
           if (a === "Copy Next Part") {
-            await vscode.commands.executeCommand("copyPasta.copyNextPart");
+            await vscode.commands.executeCommand("SauceCode.copyNextPart");
           }
         });
       await setSession({ id, index: idx + 1 });

@@ -19,7 +19,7 @@ export interface PastaConfig {
 }
 
 export function getConfig(): PastaConfig {
-  const cfg = vscode.workspace.getConfiguration("copyPasta");
+  const cfg = vscode.workspace.getConfiguration("SauceCode");
   const get = <T>(k: string, d: T): T => cfg.get<T>(k) ?? d;
   return {
     defaultGlob: get("defaultGlob", "**/*"),

@@ -8,7 +8,7 @@ export function setExtensionContext(ctx: vscode.ExtensionContext) {
 
 export function getExtensionContext(): vscode.ExtensionContext {
   if (!extCtx) {
-    throw new Error("CopyPasta: ExtensionContext not set.");
+    throw new Error("SauceCode: ExtensionContext not set.");
   }
   return extCtx;
 }

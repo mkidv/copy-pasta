@@ -1,6 +1,6 @@
-# 🍝 CopyPasta – serve your code al dente
+# 🍅 SauceCode – Sauce your code with context
 
-CopyPasta lets you bundle multiple files or whole folders into a clean, AI-friendly paste.
+SauceCode lets you bundle multiple files or whole folders into a clean, AI-friendly paste.
 It adds file banners, optional comment stripping, secret masking, and token-aware chunking — so your project context is always ready to feed your favorite AI or share in reviews.
 
 ## ✨ Features
@@ -34,7 +34,7 @@ It adds file banners, optional comment stripping, secret masking, and token-awar
 
 ## ⚙️ Extension Settings
 
-This extension contributes the following settings (all under copyPasta.):
+This extension contributes the following settings (all under SauceCode.):
 
 - defaultGlob: default file glob for AI Paste.
 - exclude: additional exclude patterns.
@@ -53,28 +53,6 @@ This extension contributes the following settings (all under copyPasta.):
 
 - Oversized single files are split by line chunks, not syntax-aware.
 
-## 📦 Release Notes
-
-### 0.4.0
-
-- Add history
-- Add copy next for bundles
-- Some fixes & refactors
-
-### 0.3.0
-
-- Refactor & optimize
-- Add compact blank lines
-
-### 0.2.0
-
-- Added AI Paste Mode with context header, secret masking, token-aware chunking.
-- Added Explorer right-click support (multi-select).
-- Added Copy Tree command.
-
-### 0.1.0
-
-- Initial release, basic copy with file banners.
 
 ## 📚 Example
 
@@ -97,5 +75,5 @@ If too long, it automatically splits into PART 1/2/… with clear markers.
 
 ---
 
-**CopyPasta: the Copita _al dente_** 🍝  
+**SauceCode: _juicy_** 🍝  
 Your code, trimmed, sauced with context, and ready to paste.

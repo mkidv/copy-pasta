@@ -4,7 +4,7 @@ let chan: vscode.OutputChannel | null = null;
 
 export function cpLog(): vscode.OutputChannel {
   if (!chan) {
-    chan = vscode.window.createOutputChannel("CopyPasta");
+    chan = vscode.window.createOutputChannel("SauceCode");
   }
   return chan;
 }

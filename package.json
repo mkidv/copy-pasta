@@ -1,17 +1,17 @@
 {
-  "name": "copy-pasta",
-  "displayName": "copy-pasta",
-  "description": "Serve your code al dente",
-  "version": "0.4.0",
+  "name": "sauce-code",
+  "displayName": "SauceCode",
+  "description": "Sauce your code with context",
+  "version": "0.5.0",
   "publisher": "mki",
   "repository": {
     "type": "git",
-    "url": "https://github.com/mkidv/copy-pasta.git"
+    "url": "https://github.com/mkidv/sauce-code.git"
   },
   "bugs": {
-    "url": "https://github.com/mkidv/copy-pasta/issues"
+    "url": "https://github.com/mkidv/sauce-code/issues"
   },
-  "homepage": "https://github.com/mkidv/copy-pasta#readme",
+  "homepage": "https://github.com/mkidv/sauce-code#readme",
   "engines": {
     "vscode": "^1.104.0"
   },
@@ -19,55 +19,55 @@
     "Other"
   ],
   "activationEvents": [
-    "onCommand:copyPasta.aiPaste",
-    "onCommand:copyPasta.copyTree",
-    "onCommand:copyPasta.aiPasteFromExplorer",
-    "onCommand:copyPasta.copyTreeFromExplorer"
+    "onCommand:sauceCode.aiPaste",
+    "onCommand:sauceCode.copyTree",
+    "onCommand:sauceCode.aiPasteFromExplorer",
+    "onCommand:sauceCode.copyTreeFromExplorer"
   ],
   "main": "./dist/extension.js",
   "contributes": {
     "menus": {
       "explorer/context": [
         {
-          "command": "copyPasta.aiPasteFromExplorer",
-          "group": "navigation@10",
+          "command": "sauceCode.aiPasteFromExplorer",
+          "group": "sauceCode@1",
           "when": "resourceScheme == file"
         },
         {
-          "command": "copyPasta.copyTreeFromExplorer",
-          "group": "navigation@11",
+          "command": "sauceCode.copyTreeFromExplorer",
+          "group": "sauceCode@2",
           "when": "resourceScheme == file"
         }
       ]
     },
     "commands": [
       {
-        "command": "copyPasta.aiPaste",
-        "title": "Copy: AI Paste (token-aware)"
+        "command": "sauceCode.aiPaste",
+        "title": "SauceCode: AI Paste"
       },
       {
-        "command": "copyPasta.copyTree",
-        "title": "Copy: Tree"
+        "command": "sauceCode.copyTree",
+        "title": "SauceCode: Copy Tree"
       },
       {
-        "command": "copyPasta.aiPasteFromExplorer",
-        "title": "Copy: AI Paste (from selection)"
+        "command": "sauceCode.aiPasteFromExplorer",
+        "title": "SauceCode: AI Paste (from selection)"
       },
       {
-        "command": "copyPasta.copyTreeFromExplorer",
-        "title": "Copy: Tree (from selection)"
+        "command": "sauceCode.copyTreeFromExplorer",
+        "title": "SauceCode: Copy Tree (from selection)"
       }
     ],
     "configuration": {
       "type": "object",
-      "title": "CopyPasta",
+      "title": "sauceCode",
       "properties": {
-        "copyPasta.defaultGlob": {
+        "sauceCode.defaultGlob": {
           "type": "string",
           "default": "**/*.{dart,ts,tsx,js,jsx,rs,py,go,java,kt,c,cc,cpp,h,hpp,cs,swift,sh,yml,yaml,toml,md,sql,json}",
           "description": "Default file glob used when running AI Paste from the command."
         },
-        "copyPasta.exclude": {
+        "sauceCode.exclude": {
           "type": "array",
           "items": {
             "type": "string"
@@ -93,12 +93,12 @@
           ],
           "description": "Additional exclusion globs applied when searching files."
         },
-        "copyPasta.maxBytesPerFile": {
+        "sauceCode.maxBytesPerFile": {
           "type": "number",
           "default": 2000000,
           "description": "Skip files larger than this size (in bytes)."
         },
-        "copyPasta.stripMode": {
+        "sauceCode.stripMode": {
           "type": "string",
           "enum": [
             "none",
@@ -108,47 +108,47 @@
           "default": "safe",
           "description": "Comment stripping mode: none, safe (strip comments), or keep-doc (keep doc comments)."
         },
-        "copyPasta.stripDocstringsInPython": {
+        "sauceCode.stripDocstringsInPython": {
           "type": "boolean",
           "default": true,
           "description": "Also strip triple-quoted Python docstrings (ignored when stripMode is keep-doc)."
         },
-        "copyPasta.compactBlankLines": {
+        "sauceCode.compactBlankLines": {
           "type": "boolean",
           "default": true,
           "description": "Collapse multiple blank lines in the final bundle output (post-process)."
         },
-        "copyPasta.maskSecrets": {
+        "sauceCode.maskSecrets": {
           "type": "boolean",
           "default": true,
           "description": "Mask common secret patterns (API keys, JWT, PEM blocks) in copied content."
         },
-        "copyPasta.normalizeTabsToSpaces": {
+        "sauceCode.normalizeTabsToSpaces": {
           "type": "boolean",
           "default": true,
           "description": "Normalize TAB characters to two spaces in copied content."
         },
-        "copyPasta.tokenBudget": {
+        "sauceCode.tokenBudget": {
           "type": "number",
           "default": 12000,
           "description": "Approximate token budget per part (tokens ≈ characters/4)."
         },
-        "copyPasta.splitOversizedFiles": {
+        "sauceCode.splitOversizedFiles": {
           "type": "boolean",
           "default": true,
           "description": "Split single files that exceed the token budget into multiple parts."
         },
-        "copyPasta.oversizedChunkLines": {
+        "sauceCode.oversizedChunkLines": {
           "type": "number",
           "default": 400,
           "description": "Number of lines per sub-part when splitting oversized files."
         },
-        "copyPasta.includeTree": {
+        "sauceCode.includeTree": {
           "type": "boolean",
           "default": true,
           "description": "Include an ASCII directory tree of the project in the copied bundle."
         },
-        "copyPasta.folderCopyMode": {
+        "sauceCode.folderCopyMode": {
           "type": "string",
           "enum": [
             "all",

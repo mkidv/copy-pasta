@@ -1,7 +1,7 @@
 import { getExtensionContext } from "./ctx";
 
-const HISTORY_KEY = "copyPasta.history.v1";
-const SESSION_KEY = "copyPasta.session.v1";
+const HISTORY_KEY = "SauceCode.history.v1";
+const SESSION_KEY = "SauceCode.session.v1";
 const MAX = 20;
 
 export interface BundleEntry {

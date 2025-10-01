@@ -9,12 +9,12 @@ async function copy(text: string, msg: string) {
 export async function copyLast() {
   const hist = getHistory();
   if (!hist.length) {
-    vscode.window.showInformationMessage("CopyPasta: no history yet.");
+    vscode.window.showInformationMessage("SauceCode: no history yet.");
     return;
   }
   const last = hist[0];
   if (last.partsCount === 1) {
-    await copy(last.parts[0], "CopyPasta – last bundle copied (1 part).");
+    await copy(last.parts[0], "SauceCode – last bundle copied (1 part).");
     await setSession(null);
     return;
   }
@@ -26,7 +26,7 @@ export async function copyLast() {
         idx: i,
       })),
     ],
-    { title: "CopyPasta – Last bundle" }
+    { title: "SauceCode – Last bundle" }
   );
   if (!pick) {
     return;
@@ -43,13 +43,13 @@ export async function copyLast() {
               : "")
         )
         .join("\n"),
-      `CopyPasta – last bundle copied (${last.partsCount} parts).`
+      `SauceCode – last bundle copied (${last.partsCount} parts).`
     );
     await setSession(null);
   } else {
     await copy(
       last.parts[pick.idx],
-      `CopyPasta – PART ${pick.idx + 1}/${last.partsCount} copied.`
+      `SauceCode – PART ${pick.idx + 1}/${last.partsCount} copied.`
     );
     await setSession({ id: last.id, index: pick.idx + 1 });
     if (pick.idx + 1 < last.partsCount) {
@@ -69,18 +69,18 @@ export async function copyNextPart() {
   const sess = getSession();
   if (!sess) {
     vscode.window.showInformationMessage(
-      "CopyPasta: no active multi-part session."
+      "SauceCode: no active multi-part session."
     );
     return;
   }
   const bundle = hist.find((h) => h.id === sess.id);
   if (!bundle) {
-    vscode.window.showWarningMessage("CopyPasta: session bundle not found.");
+    vscode.window.showWarningMessage("SauceCode: session bundle not found.");
     await setSession(null);
     return;
   }
   if (sess.index >= bundle.parts.length) {
-    vscode.window.showInformationMessage("CopyPasta: session completed.");
+    vscode.window.showInformationMessage("SauceCode: session completed.");
     await setSession(null);
     return;
   }
@@ -89,13 +89,13 @@ export async function copyNextPart() {
   const done = idx + 1;
   if (done >= bundle.parts.length) {
     vscode.window.showInformationMessage(
-      `CopyPasta – PART ${done}/${bundle.parts.length} copied. Session finished.`
+      `SauceCode – PART ${done}/${bundle.parts.length} copied. Session finished.`
     );
     await setSession(null);
   } else {
     vscode.window
       .showInformationMessage(
-        `CopyPasta – PART ${done}/${bundle.parts.length} copied.`,
+        `SauceCode – PART ${done}/${bundle.parts.length} copied.`,
         "Copy Next Part"
       )
       .then(async (act) => {
@@ -110,7 +110,7 @@ export async function copyNextPart() {
 export async function showHistory() {
   const hist = getHistory();
   if (!hist.length) {
-    vscode.window.showInformationMessage("CopyPasta: history is empty.");
+    vscode.window.showInformationMessage("SauceCode: history is empty.");
     return;
   }
   const pick = await vscode.window.showQuickPick(
@@ -122,7 +122,7 @@ export async function showHistory() {
       )} tokens`,
       id: h.id,
     })),
-    { title: "CopyPasta – History" }
+    { title: "SauceCode – History" }
   );
   if (!pick) {
     return;
@@ -137,7 +137,7 @@ export async function showHistory() {
         act: `p:${i}`,
       })),
     ],
-    { title: "CopyPasta – Choose action" }
+    { title: "SauceCode – Choose action" }
   );
   if (!action) {
     return;
@@ -153,7 +153,7 @@ export async function showHistory() {
         .join("\n")
     );
     vscode.window.showInformationMessage(
-      `CopyPasta – bundle copied (${h.partsCount} parts).`
+      `SauceCode – bundle copied (${h.partsCount} parts).`
     );
     await setSession(null);
   } else {
@@ -161,7 +161,7 @@ export async function showHistory() {
     await vscode.env.clipboard.writeText(h.parts[idx]);
     vscode.window
       .showInformationMessage(
-        `CopyPasta – PART ${idx + 1}/${h.partsCount} copied.`,
+        `SauceCode – PART ${idx + 1}/${h.partsCount} copied.`,
         "Copy Next Part"
       )
       .then(async (a) => {
