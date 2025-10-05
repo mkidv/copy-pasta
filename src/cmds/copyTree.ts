@@ -1,5 +1,13 @@
 import * as vscode from "vscode";
 import { buildTree } from "@core/fsTree";
+import {
+  buildGitignoreTree,
+  GitIgnoreMap,
+  ignores,
+  makeGlobExcluder,
+} from "@core/gitignore";
+import { getConfig } from "@core/config";
+import path from "path";
 
 export async function copyTree() {
   const ws = vscode.workspace.workspaceFolders?.[0];
@@ -8,6 +16,8 @@ export async function copyTree() {
     return;
   }
 
+  const cfg = getConfig();
+
   const choice = await vscode.window.showQuickPick(
     [
       { label: "Workspace root", root: ws.uri },
@@ -15,7 +25,7 @@ export async function copyTree() {
     ],
     { title: "Select workspace root" }
   );
-  const root =
+  const rootUri =
     choice?.root ??
     (
       await vscode.window.showOpenDialog({
@@ -26,11 +36,33 @@ export async function copyTree() {
       })
     )?.[0];
 
-  if (!root) {
+  if (!rootUri) {
     return;
   }
 
-  const tree = await buildTree(root);
+  let gi: GitIgnoreMap | null = null;
+  if (cfg.useGitignore) {
+    try {
+      gi = await buildGitignoreTree(rootUri.fsPath);
+    } catch {
+      gi = null;
+    }
+  }
+
+  const tree = cfg.includeTree
+    ? await buildTree(rootUri, 64, (abs) => {
+        const byGlobs = cfg.exclude.length
+          ? makeGlobExcluder(rootUri.fsPath, cfg.exclude)(abs)
+          : false;
+        if (byGlobs) {
+          return true;
+        }
+        return cfg.useGitignore && gi
+          ? ignores(gi, rootUri.fsPath, abs)
+          : false;
+      })
+    : null;
+
   await vscode.env.clipboard.writeText("```text\n" + tree + "\n```");
   vscode.window.showInformationMessage("Tree copied.");
 }

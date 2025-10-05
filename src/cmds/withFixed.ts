@@ -12,6 +12,7 @@ import {
 import { pushHistory, setSession } from "@core/history";
 import { logBlock, toastWithLog } from "@core/log";
 import { processUris } from "@core/processor";
+import { buildGitignoreTree, GitIgnoreMap, ignores, makeGlobExcluder } from "@core/gitignore";
 
 export async function aiPasteWithFixedUris(
   uris: vscode.Uri[],
@@ -35,8 +36,22 @@ export async function aiPasteWithFixedUris(
   let skipped: { path: string; reason: string }[] = [];
   let errors: string[] = [];
 
+  let gi: GitIgnoreMap | null = null;
+  if (cfg.useGitignore) {
+    gi = await buildGitignoreTree(rootUri.fsPath);
+  }
+
+  const filtered = !gi
+    ? uris
+    : uris.filter((u) => !ignores(gi!, rootUri.fsPath, u.fsPath));
+
+  if (!filtered.length) {
+    vscode.window.showWarningMessage("All files ignored by .gitignore.");
+    return;
+  }
+
   const out = await processUris({
-    uris,
+    uris: filtered,
     cfg,
     rootFs,
     ignoreSizeLimit: !!ignoreSize,
@@ -57,7 +72,20 @@ export async function aiPasteWithFixedUris(
     return;
   }
 
-  const tree = cfg.includeTree ? await buildTree(rootUri) : null;
+  const tree = cfg.includeTree
+    ? await buildTree(rootUri, 64, (abs) => {
+        const byGlobs = cfg.exclude.length
+          ? makeGlobExcluder(rootUri.fsPath, cfg.exclude)(abs)
+          : false;
+        if (byGlobs) {
+          return true;
+        }
+        return cfg.useGitignore && gi
+          ? ignores(gi, rootUri.fsPath, abs)
+          : false;
+      })
+    : null;
+
   const parts = await buildBundle({
     root: rootUri,
     metas,
@@ -143,7 +171,7 @@ export async function aiPasteWithFixedUris(
     );
     await toastWithLog(`Skipped ${skipped.length} file(s).`);
   }
-  
+
   if (errors.length) {
     logBlock("withFixed – errors", errors);
     await toastWithLog(`Some selected files failed: ${errors.length}.`);

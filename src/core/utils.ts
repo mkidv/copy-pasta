@@ -4,6 +4,27 @@ import * as crypto from "crypto";
 
 export const CONCURRENCY = 16;
 
+export function decodeUtf8(bytes: Uint8Array): string {
+  return new TextDecoder("utf-8", { fatal: false, ignoreBOM: true }).decode(
+    bytes
+  );
+}
+
+export function isProbablyBinary(bytes: Uint8Array): boolean {
+  const n = Math.min(bytes.length, 8192);
+  let ctrl = 0;
+  for (let i = 0; i < n; i++) {
+    const b = bytes[i];
+    if (b === 0) {
+      return true;
+    }
+    if (b < 7 || (b > 13 && b < 32)) {
+      ctrl++;
+    }
+  }
+  return ctrl > n / 100;
+}
+
 export function pLimit(n: number) {
   let active = 0;
   const queue: Array<() => void> = [];
@@ -35,7 +56,9 @@ export function estimateTokens(s: string): number {
 }
 
 export function chunkByLines(text: string, linesPerChunk: number): string[] {
-  if (linesPerChunk <= 0) {return [text];}
+  if (linesPerChunk <= 0) {
+    return [text];
+  }
   const lines = text.split("\n");
   const chunks: string[] = [];
   for (let i = 0; i < lines.length; i += linesPerChunk) {

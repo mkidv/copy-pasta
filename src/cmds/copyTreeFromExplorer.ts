@@ -1,10 +1,14 @@
 import * as vscode from "vscode";
 import { buildTree, isDir } from "@core/fsTree";
+import { buildGitignoreTree, GitIgnoreMap, ignores, makeGlobExcluder } from "@core/gitignore";
+import { getConfig } from "@core/config";
 
 export async function copyTreeFromExplorer(
   uri: vscode.Uri,
   all?: vscode.Uri[]
 ) {
+  const cfg = getConfig();
+
   const targets = (all && all.length ? all : [uri]).filter(Boolean);
   if (!targets.length) {
     vscode.window.showWarningMessage("Nothing selected.");
@@ -25,7 +29,26 @@ export async function copyTreeFromExplorer(
 
   let out = "";
   for (const d of dirs) {
-    const tree = await buildTree(d);
+    let gi: GitIgnoreMap | null = null;
+    if (cfg.useGitignore) {
+      try {
+        gi = await buildGitignoreTree(d.fsPath);
+      } catch {
+        gi = null;
+      }
+    }
+
+    const tree = cfg.includeTree
+      ? await buildTree(d, 64, (abs) => {
+          const byGlobs = cfg.exclude.length
+            ? makeGlobExcluder(d.fsPath, cfg.exclude)(abs)
+            : false;
+          if (byGlobs) {
+            return true;
+          }
+          return cfg.useGitignore && gi ? ignores(gi, d.fsPath, abs) : false;
+        })
+      : null;
     out += "```text\n" + tree + "\n```\n\n";
   }
 

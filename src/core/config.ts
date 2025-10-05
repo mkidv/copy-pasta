@@ -16,13 +16,18 @@ export interface PastaConfig {
   stripDocstringsInPython: boolean;
   folderCopyMode: "all" | "respectExcludes";
   maxDepthExplorer: number;
+  detectBinary: boolean;
+  useGitignore: boolean;
 }
 
 export function getConfig(): PastaConfig {
   const cfg = vscode.workspace.getConfiguration("sauceCode");
   const get = <T>(k: string, d: T): T => cfg.get<T>(k) ?? d;
   return {
-    defaultGlob: get("defaultGlob", "**/*.{dart,ts,tsx,js,jsx,rs,py,go,java,kt,c,cc,cpp,h,hpp,cs,swift,sh,yml,yaml,toml,md,sql,json}"),
+    defaultGlob: get(
+      "defaultGlob",
+      "**/*.{dart,ts,tsx,js,jsx,rs,py,go,java,kt,c,cc,cpp,h,hpp,cs,swift,sh,yml,yaml,toml,md,sql,json}"
+    ),
     exclude: get("exclude", []),
     maxBytesPerFile: get("maxBytesPerFile", 2_000_000),
     stripMode: get<StripMode>("stripMode", "safe"),
@@ -36,5 +41,7 @@ export function getConfig(): PastaConfig {
     stripDocstringsInPython: get("stripDocstringsInPython", true),
     folderCopyMode: get("folderCopyMode", "all"),
     maxDepthExplorer: get("maxDepthExplorer", 1024),
+    detectBinary: get("detectBinary", true),
+    useGitignore: get("useGitignore", true),
   };
 }

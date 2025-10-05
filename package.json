@@ -3,7 +3,7 @@
   "displayName": "SauceCode",
   "description": "Sauce your code with context",
   "icon": "assets/icon.png",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "publisher": "mki",
   "repository": {
     "type": "git",
@@ -166,6 +166,17 @@
           ],
           "default": "all",
           "description": "When starting from folders in Explorer: include every file (ignore excludes/size) or respect exclusion globs and size limits."
+        },
+        "codelens": false,
+        "sauceCode.detectBinary": {
+          "type": "boolean",
+          "default": true,
+          "description": "Skip files detected as binary using a small header scan."
+        },
+        "sauceCode.useGitignore": {
+          "type": "boolean",
+          "default": true,
+          "description": "Respect .gitignore files when selecting and bundling."
         }
       }
     }
@@ -198,6 +209,7 @@
     "typescript": "^5.9.2"
   },
   "dependencies": {
+    "ignore": "^7.0.5",
     "vsce": "^2.15.0"
   }
 }

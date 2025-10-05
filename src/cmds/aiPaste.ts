@@ -9,6 +9,12 @@ import { exec as execCb } from "child_process";
 import { promisify } from "util";
 import { pushHistory, setSession } from "@core/history";
 import { processUris } from "@core/processor";
+import {
+  buildGitignoreTree,
+  GitIgnoreMap,
+  ignores,
+  makeGlobExcluder,
+} from "@core/gitignore";
 
 const exec = promisify(execCb);
 
@@ -71,6 +77,20 @@ export async function aiPaste() {
     return;
   }
 
+  let gi: GitIgnoreMap | null = null;
+  if (cfg.useGitignore) {
+    gi = await buildGitignoreTree(rootUri.fsPath);
+  }
+
+  const filtered = !gi
+    ? uris
+    : uris.filter((u) => !ignores(gi!, rootUri.fsPath, u.fsPath));
+
+  if (!filtered.length) {
+    vscode.window.showWarningMessage("All files ignored by .gitignore.");
+    return;
+  }
+
   // Prepare bundles
   let metas: FileMeta[] = [];
   let blocks: string[] = [];
@@ -83,8 +103,8 @@ export async function aiPaste() {
       title: "SauceCode: preparing files…",
     },
     async () => {
-       const out = await processUris({
-        uris,
+      const out = await processUris({
+        uris: filtered,
         cfg,
         rootFs: rootUri.fsPath,
         ignoreSizeLimit: false,
@@ -122,7 +142,20 @@ export async function aiPaste() {
     git.dirty = st.trim().length ? "dirty" : "clean";
   } catch {}
 
-  const tree = cfg.includeTree ? await buildTree(rootUri) : null;
+  const tree = cfg.includeTree
+    ? await buildTree(rootUri, 64, (abs) => {
+        const byGlobs = cfg.exclude.length
+          ? makeGlobExcluder(rootUri.fsPath, cfg.exclude)(abs)
+          : false;
+        if (byGlobs) {
+          return true;
+        }
+        return cfg.useGitignore && gi
+          ? ignores(gi, rootUri.fsPath, abs)
+          : false;
+      })
+    : null;
+
   const parts = await buildBundle({
     root: rootUri,
     metas,
@@ -209,11 +242,11 @@ export async function aiPaste() {
     logBlock("aiPaste – errors", errors);
     await toastWithLog(`Some files failed: ${errors.length}.`);
   }
-  
+
   if (skipped.length) {
     logBlock(
       "aiPaste – skipped (oversized or filtered)",
-      skipped.map(s => `- ${s.path} (${s.reason})`)
+      skipped.map((s) => `- ${s.path} (${s.reason})`)
     );
     logInfo(`Total skipped: ${skipped.length}`);
   }
